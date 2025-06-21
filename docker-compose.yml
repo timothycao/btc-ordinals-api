@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  api:
+    build: .  # Build image using Dockerfile from current directory
+    ports:
+      - "3000:3000" # Map port 3000 of the container to port 3000 on the host
+    env_file:
+      - .env  # Load environment variables from .env file
+    depends_on:
+      - redis # Ensure Redis service starts before API
+    command: node dist/index.js # Run the API
+  
+  redis:
+    image: redis:7-alpine # Use official Redis image
+    ports:
+      - "6379:6379" # Map Redis port to host
