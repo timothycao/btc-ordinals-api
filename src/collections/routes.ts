@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { getCollections } from './service';
+import { getCollections, getCollectionBySlug } from './service';
 import { FilterOptions } from './types';
 
 // Create Express router instance
@@ -18,7 +18,7 @@ router.get('/', async (req: Request, res: Response) => {
         const collections = await getCollections(filters);
 
         // Format API response fields to match requirement spec
-        const formatted_collections = collections.map(c => ({
+        const formatted = collections.map(c => ({
             collection_name: c.collection_name,
             floor_price: c.floor_price,
             '24h_volume': c.volume,     // Required key name
@@ -26,7 +26,7 @@ router.get('/', async (req: Request, res: Response) => {
             image_url: c.image_url
         }));
 
-        res.json(formatted_collections);
+        res.json(formatted);
     } catch (error: any) {
         // Handle and propagate errors
         const status = error.status || 500;
@@ -34,6 +34,26 @@ router.get('/', async (req: Request, res: Response) => {
         const message = error.message || 'Unexpected server error';
 
         console.error('GET /collections error:', error);
+        res.status(status).json({ source, error: message });
+    }
+});
+
+// GET /collections/:bitcoin-frogs
+router.get('/:slug', async (req: Request, res: Response) => {
+    try {
+        const slug = req.params.slug;
+
+        // Fetch detailed collections stats by slug
+        const collection = await getCollectionBySlug(slug)
+
+        res.json(collection);
+    } catch (error: any) {
+        // Handle and propagate errors
+        const status = error.status || 500;
+        const source = error.source || 'Server';
+        const message = error.message || 'Unexpected server error';
+        
+        console.error('GET /collections/:slug error:', error);
         res.status(status).json({ source, error: message });
     }
 });
