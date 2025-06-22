@@ -17,7 +17,12 @@ git clone https://github.com/timothycao/btc-ordinals-api.git
 cd btc-ordinals-api
 ```
 
-2. Run the API:
+2. Create .env file in the root directory:
+```bash
+echo -e "PORT=3000\nREDIS_URL=redis://redis:6379" > .env
+```
+
+3. Run the API:
 
 ```bash
 docker compose up --build
